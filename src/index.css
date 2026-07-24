@@ -1,0 +1,27 @@
+@import 'tailwindcss';
+@config '../tailwind.config.ts';
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-creme-50 text-anthracite-800 antialiased;
+  }
+  html.dark body {
+    @apply bg-anthracite-900 text-creme-50;
+  }
+  #root {
+    min-height: 100svh;
+    max-width: 480px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@layer utilities {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
