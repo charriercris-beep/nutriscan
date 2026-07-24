@@ -13,6 +13,7 @@ import {
   moyenneGlissante7j,
 } from '../lib/calculs'
 import { aujourdhui } from '../lib/date'
+import CourbePoids from '../components/CourbePoids'
 
 const ACTIVITES: { valeur: Activite; label: string; description: string }[] = [
   { valeur: 'sedentaire', label: 'Sédentaire', description: 'Bureau, peu de marche' },
@@ -273,15 +274,14 @@ export default function Profil() {
           </button>
         </div>
 
-        {moyennes.length > 0 ? (
-          <div className="bg-white dark:bg-anthracite-800 rounded-2xl p-4 shadow-sm text-sm text-anthracite-700/70 dark:text-creme-100/70">
-            <div>{moyennes.length} pesée(s) enregistrée(s)</div>
-            <div>Moyenne glissante (7 j) la plus récente : {moyennes[moyennes.length - 1].moyenne} kg</div>
-            <div className="text-xs mt-1 italic">La courbe détaillée est visible dans l'onglet Statistiques.</div>
-          </div>
-        ) : (
-          <div className="text-sm text-anthracite-700/60 dark:text-creme-100/60 italic">Aucune pesée pour le moment.</div>
-        )}
+        <div className="bg-white dark:bg-anthracite-800 rounded-2xl p-4 shadow-sm">
+          <CourbePoids pesees={pesees} objectifKg={poidsObjectifKg} />
+          {moyennes.length > 0 && (
+            <div className="text-xs text-anthracite-700/60 dark:text-creme-100/60 mt-2">
+              Moyenne glissante (7 j) la plus récente : {moyennes[moyennes.length - 1].moyenne} kg
+            </div>
+          )}
+        </div>
       </section>
 
       <p className="text-xs text-center text-anthracite-700/60 dark:text-creme-100/60 pt-4 border-t border-sauge-100 dark:border-anthracite-700">
