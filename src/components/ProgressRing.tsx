@@ -4,7 +4,7 @@ interface Props {
   epaisseur?: number
   couleur?: string
   fond?: string
-  enfants?: React.ReactNode
+  children?: React.ReactNode
 }
 
 export default function ProgressRing({
@@ -13,7 +13,7 @@ export default function ProgressRing({
   epaisseur = 14,
   couleur = '#87a878',
   fond = '#e3ebde',
-  enfants,
+  children,
 }: Props) {
   const rayon = (taille - epaisseur) / 2
   const circonference = 2 * Math.PI * rayon
@@ -39,7 +39,7 @@ export default function ProgressRing({
           style={{ ['--ring-start' as string]: circonference, ['--ring-end' as string]: offset }}
         />
       </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">{enfants}</div>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">{children}</div>
     </div>
   )
 }
