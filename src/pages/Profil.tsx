@@ -13,6 +13,7 @@ import {
   moyenneGlissante7j,
 } from '../lib/calculs'
 import { aujourdhui } from '../lib/date'
+import ToggleModeSombre from '../components/ToggleModeSombre'
 import CourbePoids from '../components/CourbePoids'
 
 const ACTIVITES: { valeur: Activite; label: string; description: string }[] = [
@@ -106,7 +107,10 @@ export default function Profil() {
 
   return (
     <div className="p-4 space-y-6 pb-8">
-      <h1 className="text-2xl font-bold text-anthracite-800 dark:text-creme-50">Mon profil</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-anthracite-800 dark:text-creme-50">Mon profil</h1>
+        <ToggleModeSombre />
+      </div>
 
       <section className="space-y-3">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-sauge-700 dark:text-sauge-300">Informations</h2>
