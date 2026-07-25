@@ -4,36 +4,56 @@ interface ReponseErreur {
   erreur: string
 }
 
-export async function analyserPhoto(base64: string): Promise<AnalyseIA> {
-  const res = await fetch('/api/analyze', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ image: base64, mediaType: 'image/jpeg', mode: 'scan' }),
-  })
-  const data = (await res.json()) as AnalyseIA | ReponseErreur
-  if (!res.ok || 'erreur' in data) {
-    throw new Error('erreur' in data ? data.erreur : 'Erreur inconnue')
+const DELAI_MAX_MS = 45000
+
+async function appelerAnalyse(payload: Record<string, unknown>): Promise<unknown> {
+  const controleur = new AbortController()
+  const minuteur = setTimeout(() => controleur.abort(), DELAI_MAX_MS)
+
+  let res: Response
+  try {
+    res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: controleur.signal,
+    })
+  } catch (e) {
+    if (e instanceof DOMException && e.name === 'AbortError') {
+      throw new Error("L'analyse a pris trop de temps (plus de 45 s). Réessaie avec une photo plus légère ou une meilleure connexion.")
+    }
+    throw new Error('Impossible de contacter le service d\'analyse. Vérifie ta connexion.')
+  } finally {
+    clearTimeout(minuteur)
   }
+
+  let data: unknown
+  try {
+    data = await res.json()
+  } catch {
+    throw new Error(`Réponse inattendue du serveur (code ${res.status}). Réessaie dans quelques instants.`)
+  }
+
+  if (!res.ok || (typeof data === 'object' && data !== null && 'erreur' in data)) {
+    const message = typeof data === 'object' && data !== null && 'erreur' in data ? (data as ReponseErreur).erreur : `Erreur inconnue (code ${res.status})`
+    throw new Error(message)
+  }
+
   return data
 }
 
+export async function analyserPhoto(base64: string): Promise<AnalyseIA> {
+  return (await appelerAnalyse({ image: base64, mediaType: 'image/jpeg', mode: 'scan' })) as AnalyseIA
+}
+
 export async function comparerPhotos(base64A: string, base64B: string): Promise<ComparaisonIA> {
-  const res = await fetch('/api/analyze', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({
-      image: base64A,
-      mediaType: 'image/jpeg',
-      image2: base64B,
-      mediaType2: 'image/jpeg',
-      mode: 'comparaison',
-    }),
-  })
-  const data = (await res.json()) as ComparaisonIA | ReponseErreur
-  if (!res.ok || 'erreur' in data) {
-    throw new Error('erreur' in data ? data.erreur : 'Erreur inconnue')
-  }
-  return data
+  return (await appelerAnalyse({
+    image: base64A,
+    mediaType: 'image/jpeg',
+    image2: base64B,
+    mediaType2: 'image/jpeg',
+    mode: 'comparaison',
+  })) as ComparaisonIA
 }
 
 /** Recalcule les valeurs nutritionnelles d'une analyse pour une nouvelle portion (en grammes). */
