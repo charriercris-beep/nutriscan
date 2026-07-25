@@ -2,6 +2,7 @@
 // La clé ANTHROPIC_API_KEY reste côté serveur, jamais exposée au client.
 
 export const config = { runtime: 'nodejs' }
+export const maxDuration = 60
 
 interface RequeteAnalyse {
   image: string // base64 sans préfixe
@@ -130,7 +131,7 @@ export default async function handler(req: Request): Promise<Response> {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: 'claude-sonnet-5',
         max_tokens: 1500,
         messages: [{ role: 'user', content }],
       }),
