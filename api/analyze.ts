@@ -1,8 +1,7 @@
 // Fonction serverless Vercel : proxy vers l'API Anthropic (vision).
 // La clé ANTHROPIC_API_KEY reste côté serveur, jamais exposée au client.
 
-export const config = { runtime: 'nodejs' }
-export const maxDuration = 60
+export const config = { runtime: 'edge' }
 
 interface RequeteAnalyse {
   image: string // base64 sans préfixe
